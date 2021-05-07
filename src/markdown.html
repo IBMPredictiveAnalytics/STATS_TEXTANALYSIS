@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=9" >
+
+<title>STATS TEXTANALYSIS</title>
+
+<link rel="stylesheet" type="text/css" href="extsyntax.css" />
+
+</head>
+
+<body>
+<h1>STATS TEXTANALYSIS</h1>
+
+<p>Tools for analysis of text</p>
+<div class="syntax">
+<p>STATS TEXTANALYSIS
+VARIABLES variable list<br/>
+OVERWRITE = NO<sup>&#42;&#42;</sup> or Yes</p>
+STOPWORDSLANG = ENGLISH<sup>&#42;&#42;</sup> OR ARABIC OR AZERBAIJANI OR DANISH OR DUTCH OR FINNISH OR FRENCH OR 
+GERMAN OR GREEK OR HUNGARIAN OR INDONESIAN OR ITALIAN OR KAZAKH OR NEPALI OR 
+NONE OR NORWEGIAN OR PORTUGUESE OR ROMANIAN OR RUSSIAN OR SLOVENE OR 
+SPANISH OR SWEDISH OR TAJIK OR TURKISH<br/>
+STEMMERLANG = ENGLISH<sup>&#42;&#42;</sup> OR ARABIC OR DANISH OR DUTCH OR FINNISH OR FRENCH OR GERMAN 
+OR HUNGARIAN OR ITALIAN OR NORWEGIAN OR PORTER OR PORTUGUESE OR 
+ROMANIAN OR RUSSIAN OR SPANISH OR SWEDISH</p>
+
+<p>/SPELLING 
+DOSPELLING = NO<sup>&#42;&#42;</sup> or YES<br/>
+EXCLUDENAMES = NO<sup>&#42;&#42;</sup> or YES<br/>
+EXTRADICT = "file specification" <br/>
+SUFFIX = name suffix<br/>
+LANGUAGE = ENGLISH<sup>&#42;&#42;</sup> OR SPANISH OR GERMAN OR FRENCH OR PORTGUESE</p>
+
+<p>/FREQUENCIES
+DOFREQ = NO<sup>&#42;&#42;</sup>or YES<br/>
+STEM = NO<sup>&#42;&#42;</sup> or YES<br/>
+COUNT = number</p>
+
+<p>/SENTIMENT
+DOSENT = NO<sup>&#42;&#42;</sup> or YES<br/>
+TYPES = NEG NEU POS COMP<br/>
+SUFFIXES = suffix for each selected type</p>
+
+<p>/SEARCH
+DOSEARCH = NO<sup>&#42;&#42;</sup> or YES<br/>
+WORDS = list of words<br/>
+MODE = ANYWORDS<sup>&#42;&#42;</sup> or ALLWORDS or PATTERN<br/>
+SUFFIX = name suffix<br/>
+STEM = NO<sup>&#42;&#42;</sup> or YES</p>
+
+
+<p>/LEXICON
+DOLEXICON NO<sup>&#42;&#42;</sup> or YES<br/>
+DSNAME = dataset name</p>
+
+<p>/WORDSCORES
+DOSCORES = NO<sup>&#42;&#42;</sup> or YES<br/>
+FILE = "file specification"</p>
+
+<p>/STEMS
+DOSTEMS = NO<sup>&#42;&#42;</sup> or YES<br/>
+SUFFIX = name suffix</p>
+
+<p>/HELP</p>
+
+<p><sup>&#42;</sup> Required<br/>
+<sup>&#42;&#42;</sup> Default</p>
+</div>
+<p>STATS TEXTANALYSIS/HELP displays this help and does nothing else.</p>
+
+
+<pre class="example"><code>
+STATS TEXTANALYSIS VARIABLES = qjob
+/FREQUENCIES DOFREQ = YES STEM = YES COUNT = 20.
+</code></pre>
+<pre class="example"><code>
+STATS TEXTANALYSIS VARIABLES = qsatisfaction
+/SENTIMENT DOSENT = YES TYPES=COMP SUFFIXES = compound.
+</code></pre>
+
+  <p>This procedure
+ provides tools for working with text data.  It is meant
+ for short text strings such as might occur in a survey question with an "Other" category
+ or open-ended questions such as opinions.  There is a document entitled <i>Analyzing Survey Text</i> on using
+ this tool to work with text that is installed in the STATS_TEXTANALYSIS
+ directory under the location where the command is installed.</p>
+ 
+ <p>The tool supports case weights, but weights are rounded to integers.  Split Files is not supported.</p>
+
+  <p>The procedure requires the installation of several items that are not
+  provided in its installation.  See the section on installation later in this document
+  for information on how to install these.
+  </p>
+
+<p><strong>VARIABLES</strong> specifies  the variables to be
+  processed using the SPELLING, FREQUENCIES, and SEARCH subcommands.  If multiple tasks are specified
+they are executed in the subcommand order listed above.</p>
+   <p class="bullet">• Variable names must be legal as Python variables.  Statistics names are
+   more general.  In particular, names for this procedure must not have periods in them, which
+   Statistics allows.  Rename any such variables you want to use.</p>
+   
+<p><strong>OVERWRITE</strong> specifies whether output variables can overwrite existing variables.
+If <strong>OVERWRITE=NO</strong> is specified and the
+  output name is already in use, a numerical suffix is added to avoid overwriting.</P>
+<P><strong>STEMMERLANG</strong> specifies the language to be used by the stemmer if doing stemming.
+It should generally match the stopwords language, but coverage is uneven, so this may not always be possible.
+PORTER is similar to the Porter English stemmer, but english is generally a better choice.  
+Technical details about stemming can be found
+<a href="https://snowballstem.org/algorithms/">here</a></p>
+  
+<h2>SPELLING</h2>  
+<p><strong>DOSPELLING</strong> specifies whether spelling correction is done or not.
+Corrected text is always in lower case except that the case of the first letter of a word is preserved
+  if that letter was not changed in the correction.
+  The spelling correction is not interactive and will sometimes guess wrong.
+	It can also be very slow.</p>
+
+<p><strong>EXCLUDENAMES</strong> specifies whether to correct people's names or not.  The procedure has
+  over 7500 names built in.  They are mostly first names.</p>
+  
+<p><strong>EXTRADICT</strong> specifies an additional dictionary to use along with the built-in one.
+ If the text includes a specialized vocabulary
+   such as technical terms or abbreviations of organization names, the results will be better if a
+   supplemental dictionary is included to prevent such words from being "corrected".  The dictionary file is
+   just plain text with one entry per line.  Once loaded, that dictionary is included in subsequent
+   spelling tasks in the session unless the dictionary language is changed. </p>
+   <p>One source of a large collection of words is <br/>
+<a href="https://github.com/dwyl/english-words/blob/master/words.zip">spelling dictionary</a>
+<br/>
+Extract the words.txt file from words.zip and specify it as an extra dictionary.
+You can also get a list with just words with alpha characters there.
+That location also contains words for some other languages.
+</p>
+  <p class="bullet">• The spelling correction is not interactive and will sometimes guess wrong.
+	It can also be very slow.  The checker is not interactive and may well be wrong, 
+	so experimentation may be necessary in determining whether to use it or not.  
+	You can improve performance by creating a dataset with only the variables for 
+	which you want to correct spelling and then merging the result back with the main dataset.</p>
+ <p><strong>SUFFIX</strong> specifies the suffix to be used in forming output names.  The default is "cor".</p>
+ 
+ <p><strong>LANGUAGE</strong> specifies which built-in spelling dictionary to use.</p>
+ 
+<h2>FREQUENCIES</h2>
+ <p><strong>DOFREQ</strong> specifies whether frequency tables are produced.  
+ There are three tables per variable: word frequencies, bigram frequencies, and trigram frequencies listing
+the most frequently occurring words up to the specified table limit size.</p>
+<p><strong>STEM</strong> specifies whether to calculate the frequencies using the stemmed
+values of the words or not.  Stemming means reducing words to their root form such as removing plurals.</p>
+<p><strong>COUNT</strong> specifies the maximum number of items to display in the tables.  The default is 10.</p>
+<h2>SENTIMENT</h2>
+<p><strong>DOSENT</strong> specifies whether to do sentiment calculations or not.
+This scores the degree of positive or negative
+sentiment in the text.  For each case, it produces one to four score variables.  The possible measures are
+negative, neutral, positive, and compound.  Compound combines the scores into an overall sentiment where
+positive values indicate a positive sentiment and negative values the opposite.  Unrecognized words are considered neutral.</p>
+<p>See<br/>
+Hutto, C.J. & Gilbert, E.E. (2014). VADER: A Parsimonious Rule-based Model for Sentiment Analysis
+ of Social Media Text. Eighth International Conference on Weblogs and Social Media (ICWSM-14). Ann Arbor, MI, June 2014.<br/>
+for details on the VADER scores.</p>
+<p><strong>TYPES</strong> specifies the types of scores to compute.</p>
+<p><strong>SUFFIXES</strong> specifies the desired suffixes in the order of the types as listed above.
+The defauls are neg, neu, pos, and comp.</p>
+
+<h2>SEARCH</h2>
+<p><strong>DOSEARCH</strong> specifies whether word searches are done or not.</p>
+<p><strong>WORDS</strong> specifies the list of words or n-grams to search for.
+To specify an n-gram, enter a hyphen between the words.  For example, good-time would be interpreted as a bigram.
+Searches are not case sensitive.</p>
+
+<p><strong>MODE</strong> specifies whether the search is for all items listed or any of the items or a pattern.  The outcome
+variable is 1 (true) if the search is successfull and 0 (false) otherwise except that if there is no text,
+the value is system missing (numeric) or blank (string).  For PATTERN, the result is a sequence of 1 and 0 values with one value per search item.
+A custom variable attribute named search is created that records the search criterion. <p>
+<p><strong>SUFFIX</strong> specifies the suffix to be appended to the output variable name.  The default is
+ser.</p>
+<p><strong>STEM</strong> specifies whether to stem words in the variables before searching.  The search
+item list is not stemmed.</p>
+
+<h2>LEXICON</h2>
+<p><strong>DOLEXICON</strong> specifies whether or not to create a lexicon dataset from the sentiment definition.
+The dataset contains the words and sentiment scores used in the scoring dictionary.  There are also booster words
+such as very and somewhat that do not appear in the lexicon.</p>
+<p><strong>DSNAME</strong> specifies the name for the dataset.</p>
+
+<h2>WORDSCORES</h2>
+<p><strong>DOSCORES</STRONG> specifies whether a sentiment scores files should be loaded.</p>
+<p><strong>FILE</strong> specifies the name of the file to be loaded.  If you generate a lexicon file first,
+you can see how the built-in words are scored as a guide to assigning scores to additional words.  You can
+also change the scores for existing words this way.  The file should be encoded as utf-8.</p>
+
+<h2>STEMS</h2
+<p><strong>DOSTEM</STRONG> specifies whether to produce variables containing the results of stemming
+the variables.  Stemming often produces results that go further than
+might be expected, so it can be useful to see how it works.  For example, "meetings" is stemmed to "meet", not "meeting".</p>
+
+<p><strong>SUFFIX</STRONG> specifies the suffix to be used to construct the output variable names.</p>
+
+<h1>Installation</h1>
+<p> This procedure requires several additional items.  After installing it, do the following.  Depending
+on your system setup, you might need to do these steps in Administrator mode.</p>
+<ul>
+<li>Make sure that you have a registered Python 3 distribution matching the Statistics version you
+are using.  For Statistics version 27, that would be Python 3.8.  If you don't have this, go to
+<a href="python.org">Python Software Foundation</a> and install from there.  Don't install this
+over the distribution installed with Statistics.  After installing it, go to Edit > Options > Files in Statistics
+and set this location for Python 3.  This process may change in a future release.</li>
+
+<li>Open a command window, cd to the location of the Python installation, and install nltk and pyspellchecker from the PyPI site:<br/>
+pip install nltk<br/>
+pip install pyspellchecker</li>
+<li>Start Python from that location (outside Statistics) and run this code.<br/>
+import nltk<br/>
+nltk.download()<br/>
+This will display a table of items you can add to your installation.  Select at least names and stopwords.</li>
+<li>Optionally go to
+<a href="https://github.com/dwyl/english-words/blob/master/words.zip">spelling dictionary</a>
+<br/>
+as mentioned above and download the file and extract the words.txt file from words.zip.</li>
+<li>Install the SPSSINC TRANS extension command via the Statistics Exensions > Extension Hub menu.</li>
+</ul>
+
+<h1>Acknowledgements</p>
+STATS TEXTANALYSIS relies on open source packages for linguistic analysis and spelling correction.
+<ul>
+<li>The NLTK project is led by Steven Bird and Liling Tan</li>
+<li>Pyspellchecker Author: Tyler Barrus</li>
+<li>Peter Norvig blog post on setting up a simple spell checking algorithm</li>
+<li>P Lison and J Tiedemann, 2016, OpenSubtitles2016: Extracting Large Parallel Corpora from Movie and TV Subtitles. 
+In Proceedings of the 10th International Conference on Language Resources and Evaluation (LREC 2016)</li>
+</ul>
+
+
+
+
+<p>&copy; Copyright(C) Jon K. Peck, 2021</p>
+
+</body>
+
+</html>
+

@@ -1,0 +1,17 @@
+Name: STATS TEXTANALYSIS
+Dialog-Specs: TextAnalysis.cfe
+Command-Specs: STATS_TEXTANALYSIS.xml
+Code-Files: texta.py,STATS_TEXTANALYSIS.py
+Misc-Files: extsyntax.css,Readme.md,Analyzing Survey Text.pdf,defaultd
+ ialogicon.png,LICENSE,markdown.html
+Summary: Various facilities for working with text data
+Description: Tools for working with text variables
+Author: Jon K Peck
+Version: 1.0.3
+Product-Version: 24
+Date: 4/24/2021
+Categories: text analysis sentiment spelling
+Plugins: Python
+Python-Version: 3
+Python-Modules: pyspellchecker,nltk
+Extension-Bundles: SPSSINC_TRANS
