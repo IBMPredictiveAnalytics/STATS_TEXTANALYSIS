@@ -6,7 +6,7 @@ version = __version__
 
 import spss, spssaux
 from extension import Template, Syntax, processcmd
-import sys, re
+import sys, re, os
 
 try:
     import nltk
@@ -15,7 +15,8 @@ except:
     install using
     pip -m install nltk
     Then use nltk.download() to add specific packages including
-    at least stopwords and names
+    at least stopwords, names, and vader_lexicon.
+    See installation instructions for details.
     
     If numpy errors occur, update the numpy module using
     pip install  numpy==1.19.5""")
@@ -330,15 +331,15 @@ def  Run(args):
         Template("SUFFIX", subc="STEMS", ktype="varname", var="stemssuffix")])
         
     #debugging
-    try:
-        import wingdbstub
-        if wingdbstub.debugger != None:
-            import time
-            wingdbstub.debugger.StopDebug()
-            time.sleep(2)
-            wingdbstub.debugger.StartDebug()
-    except:
-        pass
+    #try:
+        #import wingdbstub
+        #if wingdbstub.debugger != None:
+            #import time
+            #wingdbstub.debugger.StopDebug()
+            #time.sleep(2)
+            #wingdbstub.debugger.StartDebug()
+    #except:
+        #pass
 
     #enable localization
     global _

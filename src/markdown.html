@@ -198,7 +198,7 @@ might be expected, so it can be useful to see how it works.  For example, "meeti
 
 <p><strong>SUFFIX</STRONG> specifies the suffix to be used to construct the output variable names.</p>
 
-<h1>Installation</h1>
+<h1>Installation for Statistics Version 27</h1>
 <p> This procedure requires several additional items.  After installing it, do the following.  Depending
 on your system setup, you might need to do these steps in Administrator mode.</p>
 <ul>
@@ -214,7 +214,7 @@ pip install pyspellchecker</li>
 <li>Start Python from that location (outside Statistics) and run this code.<br/>
 import nltk<br/>
 nltk.download()<br/>
-This will display a table of items you can add to your installation.  Select at least names and stopwords.</li>
+This will display a table of items you can add to your installation.  Select at least names, stopwords, and vader_lexicon.</li>
 <li>Optionally go to
 <a href="https://github.com/dwyl/english-words/blob/master/words.zip">spelling dictionary</a>
 <br/>
@@ -222,7 +222,25 @@ as mentioned above and download the file and extract the words.txt file from wor
 <li>Install the SPSSINC TRANS extension command via the Statistics Exensions > Extension Hub menu.</li>
 </ul>
 
-<h1>Acknowledgements</p>
+<h1>Installation for SPSS Statistics Version 28 and Later</h1>
+<p>This procedure requires several additional items. After installing it, do the following. Depending on your system setup, you might need to do these steps in Administrator mode.  It is no longer necessary to install a separate Python distribution.</h1>
+<ul>
+<li>Start Statistics.  You might need to run it as Administrator depending on your security settings.</li>
+<li>Open a syntax window and run the following commands<br/>
+host command='"spssloc\statisticspython3.bat" -m pip install nltk'.<br/>
+host command='"spssloc\statisticspython3.bat" -m pip install pyspellchecker'.<br/>
+Replace spssloc with the full path of the location where SPSS Statistics is installed on your system.<br/>
+Be sure to use the single quote character (') for the outer quotes.  The double quotes (") are not necessary unless the SPSS location contains any blanks.<br/>
+<li>Run this code<br/>
+begin program python3.<br/>
+nltk.download()<br/>
+end program.<br/>
+This will bring up a window listing the packages available for nltk.  Click on All Packages and choose at least names, stopwords, and vader_lexicon.</li>
+<li>Optionally, go to spelling dictionary and extract the words.txt file from words.zip.  Specify that location when you run the procedure.</li>
+<li>Install the SPSSINC TRANS extension command via the Statistics Extensions > Extension Hub menu.</li>
+</ul>
+
+<h1>Acknowledgements</h1>
 STATS TEXTANALYSIS relies on open source packages for linguistic analysis and spelling correction.
 <ul>
 <li>The NLTK project is led by Steven Bird and Liling Tan</li>

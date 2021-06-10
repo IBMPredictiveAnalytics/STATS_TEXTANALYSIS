@@ -8,6 +8,7 @@
 # 02-feb-2021 Add split file support
 # 17-mar-2021 Output improvements
 # 18-apr-2021 Weight support, n-gram improvements, more language support
+# 03-jun-2021 surface exception if vader_lexicon is not installed
 # Citations:
 # nltk
 # Steven Bird, Ewan Klein, and Edward Loper (2009). Natural Language Processing with Python. O'Reilly Media Inc.
@@ -19,13 +20,13 @@
 # https://pypi.org/project/pyspellchecker/
 # debugging
 # makes debug apply only to the current thread
-try:
-    import wingdbstub
-    import threading
-    wingdbstub.Ensure()
-    wingdbstub.debugger.SetDebugThreads({threading.get_ident(): 1})
-except:
-    pass
+#try:
+    #import wingdbstub
+    #import threading
+    #wingdbstub.Ensure()
+    #wingdbstub.debugger.SetDebugThreads({threading.get_ident(): 1})
+#except:
+    #pass
 
 import spss, spssdata, spssaux, re, nltk, sys
 
@@ -128,13 +129,12 @@ def freqs(varname, label="", weightvar=None, stem=False, stemcode=None, stemmerl
 
     curs.CClose()
     
-
-    if len(allwords) == 0:
-        print("Variable {0} has no text".format(varname))
-        return
     
     #flatten the list
     allwords = [item for sublist in allwords for item in sublist]        
+    if len(allwords) == 0:
+        print("Variable {0} has no text".format(varname))
+        return    
     fd = nltk.FreqDist(allwords)
     if weightvar and len(fd) == 0:
         print(_("The weighted counts are zero"))
@@ -185,8 +185,13 @@ def freqs(varname, label="", weightvar=None, stem=False, stemcode=None, stemmerl
         print(_("No trigrams were found for variable {0}".format(varname)))
     spss.EndProcedure()    
 
-from nltk.sentiment import SentimentIntensityAnalyzer
-sia = SentimentIntensityAnalyzer()
+try:
+    from nltk.sentiment import SentimentIntensityAnalyzer
+    sia = SentimentIntensityAnalyzer()
+except:
+    # Can't raise exception here as exception details will be suppressed higher up
+    print("*** The vader_lexicon file was not found.  Please use nltk.download() to install it")
+
 
 #*****************************************************************
 #This function takes a string variable as input and produces

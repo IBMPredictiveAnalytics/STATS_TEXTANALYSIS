@@ -2,8 +2,8 @@ Name: STATS TEXTANALYSIS
 Dialog-Specs: TextAnalysis.cfe
 Command-Specs: STATS_TEXTANALYSIS.xml
 Code-Files: texta.py,STATS_TEXTANALYSIS.py
-Misc-Files: extsyntax.css,Readme.md,Analyzing Survey Text.pdf,defaultd
- ialogicon.png,LICENSE,markdown.html
+Misc-Files: extsyntax.css,Readme.md,defaultdialogicon.png,Analyzing Su
+ rvey Text.pdf,LICENSE,markdown.html
 Summary: Various facilities for working with text data
 Description: Tools for working with text variables
 Author: Jon K Peck
