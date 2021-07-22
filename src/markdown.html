@@ -39,7 +39,7 @@ DOFREQ = NO<sup>&#42;&#42;</sup>or YES<br/>
 STEM = NO<sup>&#42;&#42;</sup> or YES<br/>
 COUNT = number</p>
 
-<p>/SENTIMENT
+<p>/SENTIMENT<br/>
 DOSENT = NO<sup>&#42;&#42;</sup> or YES<br/>
 TYPES = NEG NEU POS COMP<br/>
 SUFFIXES = suffix for each selected type</p>
@@ -48,8 +48,19 @@ SUFFIXES = suffix for each selected type</p>
 DOSEARCH = NO<sup>&#42;&#42;</sup> or YES<br/>
 WORDS = list of words<br/>
 MODE = ANYWORDS<sup>&#42;&#42;</sup> or ALLWORDS or PATTERN<br/>
+POSP = part-of-speech terms<br/>
+LANG = eng<sup>&#42;&#42;</sup> see list below<br/>
 SUFFIX = name suffix<br/>
-STEM = NO<sup>&#42;&#42;</sup> or YES</p>
+STEM = NO<sup>&#42;&#42;</sup> or YES<br/>
+DISPLAYSYN= NO<sup>&#42;&#42;</sup> or YES<br/>
+Alternate WORD and POSP syntax:<br/>
+WORDS = term(poslist) term(poslist) ...</p>
+
+<p>/ENTITYSEARCH<br/>
+DOESEARCH = NO<sup>&#42;&#42;</sup> or YES<br/>
+ETYPE = ALLTYPES or ORG or PER or LOC or FAC or GPE<br/>
+SUFFIX = suffix for new variables<br/>
+OUTSIZE = integer</p>
 
 
 <p>/LEXICON
@@ -169,6 +180,61 @@ The defauls are neg, neu, pos, and comp.</p>
 <p><strong>WORDS</strong> specifies the list of words or n-grams to search for.
 To specify an n-gram, enter a hyphen between the words.  For example, good-time would be interpreted as a bigram.
 Searches are not case sensitive.</p>
+<p><strong>POSP</strong> specifies whether and how to include synonyms in the search.
+Besides searching for exact words, you can include synonyms in the search.  If any synonym is found, it counts as a hit for the main word.  What synonyms are included is specified in the POSP string.  The choices are
+<ul>
+<li>x	do not search synonyms</li>
+<li>n	noun</li>
+<li>v	verb</li>
+<li>a	adjective</li>
+<li>r	adverb</li>
+<li>y	any</li>
+</ul>
+For bigrams, specify two symbols and for trigrams specify three.  For example, xn would mean no synonyms for the first word in a bigram – just the word itself - followed by a noun synonym.  A part of speech code is required for every entry except that if none are specified, x is assumed, and if just one set is given, it is used for all terms.  As a shortcut, if the symbol string is short, it is padded with x'es.</p>
+<p>For n-grams, each synonym for the first word is combined with each synonym for the second word and so on, so the possibilities can get quite large.  Consider using x for some words in an n-gram.</p>
+<p>You can alternatively write the parts of speech as a parenthesized list following each word.  For example,<br/>
+direction(n) different-direction(nv) social-aspects(a) he-is-young(xxy) ideas(n)<br/>
+The dialog box always generates the first form, but writing syntax may be more convenient in the second.  You cannot mix the two: use POSP for everything or
+put all the part-of-speech specifications in the parenthesized form.
+<p>The term itself is always included in the synonym set, so an unknown word will have itself as a synonym.
+</p>
+<p><strong>LANG</strong> specifies the language for synonym searches.  The LANG parameter only affects the synonym search.  The following choices are available at this writing.  Additional languages
+may become available in the future.  The language codes are ISO-639 standards.
+The choices are<br/>
+eng	english<br/>
+arb	arabic<br/>
+bul	bulgarian<br/>
+cat	catalan<br/>
+cmn	chinese (simplified)<br/>
+dan	danish<br/>
+ell	greek<br/>
+eus	basque<br/>
+fas	persian<br/>
+fin	finnish<br/>
+fra	french<br/>
+glg	galacian<br/>
+heb	hebrew<br/>
+hrv	croation<br/>
+ind	indonesian<br/>
+ita	italian<br/>
+jpn	japanese<br/>
+nld	dutch<br/>
+nno	norwegian<br/>
+nob	norwegian (bokmal)<br/>
+pol	polish<br/>
+por	portuguese<br/>
+slv	slovakian<br/>
+spa	spanish<br/>
+swe	swedish<br/>
+tha	thai<br/>
+</p>
+ 
+<p><strong>DISPLAYSYN</strong>=YES to display the set of synonyms.  For example, for the trigram he-is-young with part of speech specified as xxn, the synonym set is</br>
+<blockquote>(he, is, Whitney-Young), (he, is, Lester-Willis-Young), (he, is, Pres-Young), (he, is, Cy-Young), (he, is, Brigham-Young), (he, is, young), (he, is, Danton-True-Young), (he, is, new), (he, is, offspring), (he, is, Loretta-Young), (he, is, unseasoned), (he, is, youthful), (he, is, Whitney-Moore-Young-Jr.), (he, is, immature), (he, is, vernal), (he, is, Edward-Young), (he, is, youth), (he, is, untried), (he, is, Thomas-Young), (he, is, untested), (he, is, Young)</blockquote>
+<p>Any of these items would be considered a hit.  Notice that besides several proper names, synonyms include young, youthful, immature, vernal, youth, untried, and untested following he-is.</p>
+The term itself is always included in the synonym set, so an unknown word will have itself as a synonym.
+
+
 
 <p><strong>MODE</strong> specifies whether the search is for all items listed or any of the items or a pattern.  The outcome
 variable is 1 (true) if the search is successfull and 0 (false) otherwise except that if there is no text,
@@ -178,6 +244,23 @@ A custom variable attribute named search is created that records the search crit
 ser.</p>
 <p><strong>STEM</strong> specifies whether to stem words in the variables before searching.  The search
 item list is not stemmed.</p>
+
+<h2>ENTITYSEARCH</h2>
+<p><strong>ENTITYSEARCH</strong> looks for types of items such as persons without an explicit list of texts but using the grammar of the text (English only).  
+Entities will not always be accurately detected due to the vagaries of speech and the vocabulary limitations.  Since the entity classification uses the grammar of the text, entity search seems not to work well with simple lists.  An entity may include other types of entities.  Filtering happens on the main item.</p>
+<p><strong>ETYPE</strong> specifies the type of entity to search for.  The entity types are as follows.  Only one keyword can be given.  See the dialog box
+help for examples of these types.
+Additional entity types might be available.</p>
+<ul>
+<li>ALLTYPES -search for all entity types</li>
+<li>ORG - ORGANIZATION</li>
+<li>PER - PERSON</li>
+<li>LOC - LOCATION</li>
+<li>FAC - FACILITY</li>
+<li>GPE - Geo-Political Entity</li>
+</ul>
+<p><strong>OUTSIZE</strong> specifies the width of the output variables in bytes.  The output includes the entity type and
+each distinct entity for a case, separated by /.  Duplicate entities in a case are eliminated.</p>
 
 <h2>LEXICON</h2>
 <p><strong>DOLEXICON</strong> specifies whether or not to create a lexicon dataset from the sentiment definition.
@@ -235,7 +318,7 @@ Be sure to use the single quote character (') for the outer quotes.  The double 
 begin program python3.<br/>
 nltk.download()<br/>
 end program.<br/>
-This will bring up a window listing the packages available for nltk.  Click on All Packages and choose at least names, stopwords, and vader_lexicon.</li>
+This will bring up a window listing the packages available for nltk.  Click on All Packages and choose at least names, stopwords, wordnet, and vader_lexicon.</li>
 <li>Optionally, go to spelling dictionary and extract the words.txt file from words.zip.  Specify that location when you run the procedure.</li>
 <li>Install the SPSSINC TRANS extension command via the Statistics Extensions > Extension Hub menu.</li>
 </ul>

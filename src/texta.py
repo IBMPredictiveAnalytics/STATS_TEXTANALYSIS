@@ -306,6 +306,9 @@ def haswords(text, words, mode="anywords", searchstem=False):
         textlist = tuple(stemcode(w) for w in textlist if w.isalpha())
     if not spssaux._isseq(words):   #???
         words = [words]
+    # each item in words is a list with nonsynonyms being singletons
+    # and synonym lists being possibly multiple
+    # any synonym occurence in the list makes "all" true
     scan = []
     for w in words:
         if isinstance(w, m.Word):
@@ -314,15 +317,14 @@ def haswords(text, words, mode="anywords", searchstem=False):
             scan.append(w.isin(bigram(textlist)))
         else:
             scan.append(w.isin(trigram(textlist)))
-            
     if mode == "anywords":
         return any(scan)
     elif mode == "allwords":
         return all(scan)
     elif mode == "pattern":
         return "".join(item and "1" or "0" for item in scan)
-    else:
-        return scan
+    #else:
+        #return scanlist
 
 def stems(*texts):
     """return list of stemmed text for texts"""
@@ -337,6 +339,108 @@ def stems(*texts):
             textlist = [stemcode(w) for w in textlist]
             result.append(" ".join(textlist))
     return result
+
+# get chunks for Named Entities
+#def get_continuous_chunks(text, netype, binary=True):
+    #"""Return list of Named Entities found in text
+    
+    #text is the text to search
+    #netype is the entity type, which can be "all" or a specific type
+    #binary is True or False for chunking"""
+    
+    
+    #chunked = nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(text)), binary)
+    #continuous_chunk = []
+    #current_chunk = []
+
+    #for i in chunked:
+        #if type(i) == nltk.Tree:
+            ####if netype == "all":
+            #current_chunk.append("<" + i.label()[:3] + ">")
+            #current_chunk.append(" ".join([token for token, pos in i.leaves()]))
+        #elif current_chunk:
+            ## remove redundant entity type ids
+            #if len(current_chunk) > 1:
+                #cc = [current_chunk[0]]
+                #cc.extend(item for item in current_chunk[1:] if item != cc[0])
+                #current_chunk = cc
+            #named_entity = " ".join(current_chunk)
+            #if named_entity not in continuous_chunk:
+                #continuous_chunk.append(named_entity)
+                #current_chunk = []
+        #else:
+            #continue
+
+    #if continuous_chunk:
+        #named_entity = " ".join(current_chunk)
+        #if named_entity not in continuous_chunk:
+            #continuous_chunk.append(named_entity)
+
+    #return continuous_chunk
+
+def get_continuous_chunks(text, netype, binary=True):
+    """Return list of Named Entities found in text
+    
+    text is the text to search
+    netype is the entity type, which can be "all" or a specific type
+    binary is True or False for chunking"""
+    
+    
+    chunked = nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(text)), binary)
+    chunked.append("<DONE>")    # make sure to get the last tree
+    continuous_chunk = []
+    current_chunk = []
+    ctype = None
+
+    for i in chunked:
+        if type(i) == nltk.Tree:
+            if ctype is None:
+                ctype = i.label()[:3]
+            current_chunk.append(" ".join([token for token, pos in i.leaves()]))
+        elif current_chunk:
+            named_entity = "<" + ctype + ">" +" ".join(current_chunk)
+            if named_entity not in continuous_chunk:
+                continuous_chunk.append(named_entity)
+            current_chunk = []
+            ctype = None
+    return continuous_chunk
+    
+def hasneslist(*text):
+    """Evaluate text for named entities
+    
+            ctype = None
+        else:
+            continue
+
+    #if continuous_chunk:
+        #named_entity = "<" + ctype + ">" + " ".join(current_chunk)
+        #if named_entity not in continuous_chunk:
+            #continuous_chunk.append(named_entity)
+    args is a list of variables"""
+    
+    result = []
+
+    for t in text:
+        result.append(hasnes(t, 
+            m.hasentitylistparams["etype"], m.hasentitylistparams["regexp"]))
+    return result    
+    
+    
+def hasnes(text, etype, ecompiled):
+    """return list of entities found
+    
+    etype is the entity type to look for"""
+    
+    # binary choice not yet implemented
+    
+    if len(text.rstrip()) == 0:
+        return ""    
+    
+    allent = get_continuous_chunks(text, etype, binary=False)
+    if etype == "alltypes":
+        return "/".join(item for item in allent if len(item) > 0)
+    else:
+        return "/".join(item for item in allent if len(item) > 0 and re.match(ecompiled, item) is not None)
 
     
 # ********************************************************************    
