@@ -1,9 +1,10 @@
 __author__  =  'Jon K Peck'
-__version__ =  '1.1'
+__version__ =  '1.2'
 version = __version__
 
 # history
 # 07-10-2021 add synonym and named entity search
+# 02-24-2022 add SPECIALTERMS subcommand
 
 import spss, spssaux
 from extension import Template, Syntax, processcmd
@@ -51,13 +52,6 @@ to install a separate Python distribution.
 *   Start Statistics.  You might need to run it as Administrator 
 depending on your security settings.
 *   Open a syntax window and run the following commands
-host command='"spssloc\statisticspython3.bat" -m pip install nltk'.
-host command='"spssloc\statisticspython3.bat" -m pip install pyspellchecker'.
--   Replace spssloc with the full path of the location where SPSS Statistics 
-is installed on your system.
--   Be sure to use the single quote character (') for the outer quotes 
-in the command.  The double quotes (") are not necessary unless 
-the SPSS location contains any blanks.
 *   Run this code
 begin program python3.
 nltk.download()
@@ -104,12 +98,13 @@ def dotext(varnames=None, overwrite=False, stopwordslang="english", stemmerlang=
             posp=None, displaysyn=False, searchlang="eng",
         doesearch=False, etype="alltypes", outsize=100, esuffix="eser",
         dolexicon=False, lexdsname=None,
+        doterms=False, negationfile=None, negationdsname=None, emphasisfile=None, emphasisdsname=None,
         dostems=False, stemssuffix="stem"):
     
     global allnewnames, extraspelldict, laststopwordslang, sstopwords, stopwordslangg, stemmerlangg, stemmergg
     allnewnames = []
     
-    if not any([dospelling, dofreq, dosent, dosearch, doesearch, dolexicon, doscores, dostems]):
+    if not any([dospelling, dofreq, dosent, dosearch, doesearch, dolexicon, doscores, dostems, doterms]):
         raise ValueError(_("No actions were specified for the command"))
     
     language = langabbrev[language.lower()]
@@ -146,6 +141,9 @@ def dotext(varnames=None, overwrite=False, stopwordslang="english", stemmerlang=
         if scoresfile is None:
             raise ValueError(_("A scores file load was required, but no file name was specified"))
         texta.addSentimentScores(scoresfile)
+        
+    if doterms:
+        texta.terms(negationfile, negationdsname, emphasisfile, emphasisdsname)
     
     if dofreq:
         texta.freqslist(varnames, stem=stem, stemcode=stemmergg, stemmerlang=stemmerlang, count=freqcount)
@@ -606,6 +604,12 @@ def  Run(args):
         
         Template("DOLEXICON", subc="LEXICON", ktype="bool", var="dolexicon"),
         Template("DSNAME", subc="LEXICON", ktype="varname", var="lexdsname"),
+        
+        Template("DOTERMS", subc="SPECIALTERMS", ktype="bool", var="doterms"),
+        Template("NEGATIONFILE", subc="SPECIALTERMS", ktype="literal", var="negationfile"),
+        Template("NEGATIONDSNAME", subc="SPECIALTERMS", ktype="varname", var="negationdsname"),
+        Template("EMPHASISFILE", subc="SPECIALTERMS", ktype="literal", var="emphasisfile"),
+        Template("EMPHASISDSNAME", subc="SPECIALTERMS", ktype="varname", var="emphasisdsname"),
     
         Template("DOSTEMS", subc="STEMS", ktype="bool", var="dostems"),
         Template("SUFFIX", subc="STEMS", ktype="varname", var="stemssuffix")])

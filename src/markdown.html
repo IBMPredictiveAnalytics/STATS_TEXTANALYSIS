@@ -71,6 +71,12 @@ DSNAME = dataset name</p>
 DOSCORES = NO<sup>&#42;&#42;</sup> or YES<br/>
 FILE = "file specification"</p>
 
+<p>/SPECIALTERMS DOTERMS = NO<sup>&#42;&#42;</sup>or YES<br/>
+NEGATIONDSNAME = new dataset name<br/>
+EMPHASISDSNAME = new dataset name<br/>
+NEGATIONFILE = file specification<br/>
+EMPHASISFILE = file specification</p>
+
 <p>/STEMS
 DOSTEMS = NO<sup>&#42;&#42;</sup> or YES<br/>
 SUFFIX = name suffix</p>
@@ -274,6 +280,19 @@ such as very and somewhat that do not appear in the lexicon.</p>
 you can see how the built-in words are scored as a guide to assigning scores to additional words.  You can
 also change the scores for existing words this way.  The file should be encoded as utf-8.</p>
 
+<h2>SPECIALTERMS</h2>
+<p><strong>DOTERMS</STRONG> specifies whether the following keywords should be executed.</p>
+<p><strong>NEGATIONFILE</strong> specifies a file containing a list of negation terms
+to be added to the built-in terms.</p>
+<p><strong>EMPHASISFILE</strong> specifies a file containing a list of emphasis terms
+and scores to be added to the built-in terms.</p>
+<p><strong>NEGATIONDSNAME</strong> specifies a new dataset to be created listing all the
+negation terms.</p>
+<p><strong>EMPHASISDSNAME</strong> specifies a new dataset to be created listing all the
+emphasis terms and their scores.</p>
+<p class="bullet">• If a file is loaded and the corresponding dataset is created, the
+dataset will include the material from the file.</p>
+
 <h2>STEMS</h2
 <p><strong>DOSTEM</STRONG> specifies whether to produce variables containing the results of stemming
 the variables.  Stemming often produces results that go further than
@@ -285,19 +304,14 @@ might be expected, so it can be useful to see how it works.  For example, "meeti
 <p> This procedure requires several additional items.  After installing it, do the following.  Depending
 on your system setup, you might need to do these steps in Administrator mode.</p>
 <ul>
-<li>Make sure that you have a registered Python 3 distribution matching the Statistics version you
-are using.  For Statistics version 27, that would be Python 3.8.  If you don't have this, go to
-<a href="python.org">Python Software Foundation</a> and install from there.  Don't install this
-over the distribution installed with Statistics.  After installing it, go to Edit > Options > Files in Statistics
-and set this location for Python 3.  This process may change in a future release.</li>
+<li>Install the STATS PACKAGE INSTALL extension command, which will appear on the Extensions menu, and use it to install Python modules nltk and pyspellchecker.</li>
 
-<li>Open a command window, cd to the location of the Python installation, and install nltk and pyspellchecker from the PyPI site:<br/>
-pip install nltk<br/>
-pip install pyspellchecker</li>
-<li>Start Python from that location (outside Statistics) and run this code.<br/>
-import nltk<br/>
-nltk.download()<br/>
-This will display a table of items you can add to your installation.  Select at least names, stopwords, and vader_lexicon.</li>
+<li>Open a syntax window in Statistics, and run this code.<br>
+BEGIN PROGRAM PYTHON3.<br>
+import nltk<br>
+nltk.download()<br>
+END PROGRAM.<br>
+This will display a window with a table of items you can add to your installation. Select at least names, stopwords, wordnet, and vader_lexicon.</li>
 <li>Optionally go to
 <a href="https://github.com/dwyl/english-words/blob/master/words.zip">spelling dictionary</a>
 <br/>
@@ -306,14 +320,9 @@ as mentioned above and download the file and extract the words.txt file from wor
 </ul>
 
 <h1>Installation for SPSS Statistics Version 28 and Later</h1>
-<p>This procedure requires several additional items. After installing it, do the following. Depending on your system setup, you might need to do these steps in Administrator mode.  It is no longer necessary to install a separate Python distribution.</h1>
+<p>This procedure requires several additional items. After installing it, do the following. Depending on your system setup, you might need to do these steps in Administrator mode. Most of the additional modules used by this procedure will be installed with it, but some additional steps are necessary.</h1>
 <ul>
 <li>Start Statistics.  You might need to run it as Administrator depending on your security settings.</li>
-<li>Open a syntax window and run the following commands<br/>
-host command='"spssloc\statisticspython3.bat" -m pip install nltk'.<br/>
-host command='"spssloc\statisticspython3.bat" -m pip install pyspellchecker'.<br/>
-Replace spssloc with the full path of the location where SPSS Statistics is installed on your system.<br/>
-Be sure to use the single quote character (') for the outer quotes.  The double quotes (") are not necessary unless the SPSS location contains any blanks.<br/>
 <li>Run this code<br/>
 begin program python3.<br/>
 nltk.download()<br/>

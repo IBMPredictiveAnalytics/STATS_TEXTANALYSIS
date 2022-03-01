@@ -7,7 +7,7 @@ Misc-Files: extsyntax.css,Readme.md,defaultdialogicon.png,Analyzing Su
 Summary: Various facilities for working with text data
 Description: Tools for working with text variables
 Author: Jon K Peck
-Version: 1.1.0
+Version: 1.2.0
 Product-Version: 24
 Date: 4/24/2021
 Categories: text analysis sentiment spelling

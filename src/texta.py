@@ -454,6 +454,10 @@ def hasnes(text, etype, ecompiled):
 # ********************************************************************
 
 def createLexiconDataset(name="lexicon"):
+    
+    activeds = spss.ActiveDataset()
+    if activeds == "*":
+        raise ValueError("""Stopping.  The active dataset is unnamed.""")
     curs = spssdata.Spssdata(accessType='n')
     curs.append(spssdata.vdef("word", 30))
     curs.append(spssdata.vdef("score", 0))
@@ -464,7 +468,13 @@ def createLexiconDataset(name="lexicon"):
         curs.appendvalue('score', item[1])
         curs.CommitCase()
     curs.CClose()
-    spss.Submit("DATASET NAME {0}".format(name))
+    # can't reactivate an empty active dataset
+    try:
+        spss.Submit(f"""DATASET NAME {name}.
+DATASET ACTIVATE {activeds}.""")
+    except:
+        pass
+    
 # ********************************************************************
 # This function adds words with scores or changes existing scores
 # Usage example
@@ -477,23 +487,118 @@ def createLexiconDataset(name="lexicon"):
 # word score
 # Note that words are lowercased
 # ********************************************************************
+
+def terms(negationfile, negationdsname, emphasisfile, emphasisdsname):
+    """Execute doterms actions"""
+    
+    addNegationTerms(negationfile)
+    addEmphasisTerms(emphasisfile)
+    createSpecialDatasets([negationdsname, emphasisdsname])
+    
+    
 def addSentimentScores(filespec):
     """ add a file of word, score pairs to the sentiment lexicon
     
     filespec specifies the file containing the pairs.
     SPSS file handles are supported"""
 
+    if filespec is None:
+        return
+    
     filespec = spssaux.FileHandles().resolve(filespec)
+    wordcount = 0
+    badcount = 0
+    with open(filespec) as f:
+        for line in f:
+            try:
+                word, score = line.split()
+                score = float(score)
+            except:
+                badcount += 1
+                if badcount <= 10:
+                    newline = "\n"
+                    print(f"""invalid sentiment score input: {line.replace(newline, "")}""")
+            else:
+                sia.lexicon[word.lower()] = score
+                wordcount += 1
+    print ("*** words added to lexicon from {0}: {1}".format(filespec, wordcount))
+    if badcount > 0:
+        print(f"*** Badlines: {badcount}")
+    
+def addNegationTerms(filespec):
+    """Add terms in filespec to negate terms set"""
+    
+    if filespec is None:
+        return
+    
     wordcount = 0
     with open(filespec) as f:
         for line in f:
-            word, score = line.split()
-            sia.lexicon[word.lower()] = float(score)
-            wordcount += 1
-    print ("*** words added to lexicon from {0}: {1}".format(filespec, wordcount))
+            sia.constants.NEGATE.add(line.replace("\n", "").lower())   # stripping \n if present
+            wordcount += 1    
+    print(f"Negative terms processed: {wordcount}")
     
-###addSentimentScores("r:/consult/textanalysis/lexiconadds.txt")
-
+def addEmphasisTerms(filespec):
+    """Add terms with scores to emphasis term dict"""
+    
+    if filespec is None:
+        return
+    
+    wordcount = 0
+    badcount = 0
+    with open(filespec) as f:
+        for line in f:
+            try:
+                word, score = line.split()
+                score = float(score)
+            except:
+                badcount += 1
+                if badcount <= 10:
+                    print(f"invalid emphasis score input: {line}")
+            else:
+                sia.constants.BOOSTER_DICT[word.lower()] = score
+                wordcount += 1    
+    print(f"Emphasis terms processed: {wordcount}")
+    if badcount > 0:
+        print(f"Bad emphasis terms: {badcount}")
+    
+def createSpecialDatasets(names):
+    """create negate and emphasis datasets named as per entries in names"""
+    
+    activeds = spss.ActiveDataset()
+    if activeds == "*" and any(names):
+        raise ValueError("""The active dataset must have a name to create negative or emphasis dataset.""")
+    
+    if names[0]:         # negate terms dataset
+        curs = spssdata.Spssdata(accessType='n')
+        curs.append(spssdata.vdef("negativeWord", 30))
+        curs.commitdict()
+        
+        for item in sorted(sia.constants.NEGATE):
+            curs.appendvalue('negativeWord', item)
+            curs.CommitCase()
+        curs.CClose()
+        # if the active dataset is empty as on startup, it can't be re-activated
+        try:
+            spss.Submit(f"""DATASET NAME {names[0]}.
+DATASET ACTIVATE {activeds}.""")
+        except:
+            pass
+    
+    if names[1]:  # emphasis terms dataset
+        curs = spssdata.Spssdata(accessType='n')
+        curs.append(spssdata.vdef("emphasisWord", 30))
+        curs.append(spssdata.vdef("score", 0))
+        curs.commitdict()        
+        for item in sorted(sia.constants.BOOSTER_DICT.items()):
+            curs.appendvalue('emphasisWord', item[0])
+            curs.appendvalue('score', item[1])
+            curs.CommitCase()        
+        curs.CClose()
+        spss.Submit(f"""DATASET NAME {names[1]}.
+DATASET ACTIVATE {activeds}.""")
+        
+    
 extraspelldict = []
 spell = None
 dictlang = None
