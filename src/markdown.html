@@ -107,7 +107,7 @@ STATS TEXTANALYSIS VARIABLES = qsatisfaction
  
  <p>The tool supports case weights, but weights are rounded to integers.  Split Files is not supported.</p>
 
-  <p>The procedure requires the installation of several items that are not
+  <p>The procedure requires the installation of some items that are not
   provided in its installation.  See the section on installation later in this document
   for information on how to install these.
   </p>
@@ -300,37 +300,28 @@ might be expected, so it can be useful to see how it works.  For example, "meeti
 
 <p><strong>SUFFIX</STRONG> specifies the suffix to be used to construct the output variable names.</p>
 
-<h1>Installation for Statistics Version 27</h1>
-<p> This procedure requires several additional items.  After installing it, do the following.  Depending
-on your system setup, you might need to do these steps in Administrator mode.</p>
-<ul>
-<li>Install the STATS PACKAGE INSTALL extension command, which will appear on the Extensions menu, and use it to install Python modules nltk and pyspellchecker.</li>
+<h1>Installation</h1>
+<p>This procedure requires several additional items.
+nltk files names.zip, stopwords.zip, wordnet.zip, and vader_lexicon.zip will
+be installed over the Internet if they are not present.
+However, the spell checking dictionary must be installed by the user.
+Download the spelling dictionary from
+<a href="https://github.com/dwyl/english-words/blob/master/words.zip">here</a><br>
 
-<li>Open a syntax window in Statistics, and run this code.<br>
+ and extract the words.txt file from words.zip.  Specify that location when you run the procedure.
+<p>If the SPSSINC TRANS extension command is not already installed, get it from the
+Extensions > Extension Hub menu.</p>
+<p>If the nltk toolkit is not found when the command is run, you will need to install it using
+the STATS PACKAGE INSTALL extension command, which can also be obtained via Extensions > Extension Hub.</p>
+<p>If you need to update the installed data packages - names, stopwords, wordnet, or vader_lexicon, 
+open a syntax window in Statistics, and run this code.<br><code>
 BEGIN PROGRAM PYTHON3.<br>
 import nltk<br>
 nltk.download()<br>
 END PROGRAM.<br>
-This will display a window with a table of items you can add to your installation. Select at least names, stopwords, wordnet, and vader_lexicon.</li>
-<li>Optionally go to
-<a href="https://github.com/dwyl/english-words/blob/master/words.zip">spelling dictionary</a>
-<br/>
-as mentioned above and download the file and extract the words.txt file from words.zip.</li>
-<li>Install the SPSSINC TRANS extension command via the Statistics Exensions > Extension Hub menu.</li>
-</ul>
+</code>
+This will display a window with a table of items you can add to your installation.</p>
 
-<h1>Installation for SPSS Statistics Version 28 and Later</h1>
-<p>This procedure requires several additional items. After installing it, do the following. Depending on your system setup, you might need to do these steps in Administrator mode. Most of the additional modules used by this procedure will be installed with it, but some additional steps are necessary.</h1>
-<ul>
-<li>Start Statistics.  You might need to run it as Administrator depending on your security settings.</li>
-<li>Run this code<br/>
-begin program python3.<br/>
-nltk.download()<br/>
-end program.<br/>
-This will bring up a window listing the packages available for nltk.  Click on All Packages and choose at least names, stopwords, wordnet, and vader_lexicon.</li>
-<li>Optionally, go to spelling dictionary and extract the words.txt file from words.zip.  Specify that location when you run the procedure.</li>
-<li>Install the SPSSINC TRANS extension command via the Statistics Extensions > Extension Hub menu.</li>
-</ul>
 
 <h1>Acknowledgements</h1>
 STATS TEXTANALYSIS relies on open source packages for linguistic analysis and spelling correction.
