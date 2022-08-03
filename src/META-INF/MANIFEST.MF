@@ -6,12 +6,13 @@ Misc-Files: extsyntax.css,Readme.md,defaultdialogicon.png,Analyzing Su
  rvey Text.pdf,LICENSE,markdown.html
 Summary: Various facilities for working with text data
 Description: Tools for working with text variables
+Updated 02-aug-2022
 Author: Jon K Peck
-Version: 1.3.2
+Version: 1.3.3
 Product-Version: 24
 Date: 5/23/2022
 Categories: text analysis sentiment spelling
 Plugins: Python
 Python-Version: 3
-Python-Modules: pyspellchecker,nltk
-Extension-Bundles: SPSSINC_TRANS
+Python-Modules: pyspellchecker,nltk,certifi
+Extension-Bundles: STATS_PACKAGE_INSTALL,SPSSINC_TRANS

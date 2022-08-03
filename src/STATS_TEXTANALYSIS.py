@@ -5,72 +5,132 @@ version = __version__
 # history
 # 07-10-2021 add synonym and named entity search
 # 02-24-2022 add SPECIALTERMS subcommand
+# 07-31-2022 automate nltk_data installs
 
 import spss, spssaux
 from extension import Template, Syntax, processcmd
 import sys, re, os
 from itertools import product
 
+# debugging
+        # makes debug apply only to the current thread
+#try:
+    #import wingdbstub
+    #import threading
+    #wingdbstub.Ensure()
+    #wingdbstub.debugger.SetDebugThreads({threading.get_ident(): 1})
+#except:
+    #pass
+
+def fixMacCert():
+    """Set ssl certificate path on Mac"""
+    
+    # Mac Python does not automatically set up the ssl certificates, which
+    # causes https use to fail.  This function handles that on the assumption 
+    # which requires the certifi module from PyPi
+    
+    if sys.platform != "darwin" or "SSL_CERT_FILE" in os.environ:
+        return
+    try:
+        import certifi
+    except:
+        try:
+            spss.Submit("STATS PACKAGE INSTALL PYTHON=certifi.")
+            import certifi
+        except:
+            raise SystemError("Cannot install certifi package for Mac https support.")
+    cert_path = certifi.where()
+    os.environ["SSL_CERT_FILE"] = cert_path
+    os.environ["REQUESTS_CA_BUNDLE"] = cert_path
+    
+fixMacCert()
+
+def installData(downloader, dddir):
+    """Install required nltk data files if not already present"""
+    
+    # data files go wherever nltk wants them
+    ###print(dddir)
+    ###dddir = nltk.downloader.Downloader().default_download_dir()
+    toget = []
+    for n in ['corpora/names','corpora/stopwords','corpora/wordnet','sentiment/vader_lexicon',
+              "tokenizers/punkt", "taggers/averaged_perceptron_tagger", "taggers/averaged_perceptron_tagger_ru",
+              "chunkers/maxent_ne_chunker", "corpora/words", "corpora/omw", "corpora/omw-1.4"]:
+        if not os.path.exists(dddir + os.sep + n + ".zip"):
+            dname = os.path.basename(n)
+            toget.append(dname)
+    if toget:
+        # Can't use _ translation function here, because this is running at import time
+        # not via the Run function
+        print(f"""Downloading nltk data files: {toget} to {dddir}""")
+        ###nltk.download(toget, quiet=True)    
+        downloader.download(toget, quiet=True)    
+
 try:
+    from nltk import downloader
+    dlpath = downloader.Downloader().default_download_dir()
+    installData(downloader, dlpath)
     import nltk
 except:
-    print("""The nltk module is required in order to use this module.\n""")
-    ver = int(spss.GetDefaultPlugInVersion()[4:])
-    if ver < 280:
-        print("""
-*** Installation with SPSS Statistics Version 27 ***
-This procedure requires several additional items. After installing it, do the following. 
-Depending on your system setup, you might need to do these steps in Administrator mode.
-*   Make sure that you have a registered Python 3 distribution matching the Statistics 
-version you are using. For Statistics version 27, that would be Python 3.8. 
-If you don't have this, go to Python Software Foundation and install from there. 
-Don't install this over the distribution installed with Statistics. 
-After installing it, go to Edit > Options > Files in Statistics and set 
-this location for Python 3.
-*   Open a command window, cd to the location of the Python installation, 
-and install nltk and pyspellchecker from the PyPI site:
-pip install nltk
-pip install pyspellchecker
-*   Start Python from that location and run this code.
-import nltk
-nltk.download()
-This will display a table of items you can add to your installation. 
-Select at least names, stopwords, wordnet, and vader_lexicon.
-*   Optionally, go to spelling dictionary as mentioned above 
-https://github.com/dwyl/english-words/blob/master/words.zip
-and extract the words.txt file from words.zip.  
-Specify that location when you run the procedure.
-*   Install the SPSSINC TRANS extension command via the Statistics 
-Exensions > Extension Hub menu.""")
-    else:
-        print("""
-***Installation with SPSS Statistics Version 28 and Later ***
-This procedure requires several additional items. After installing it, 
-do the following. Depending on your system setup, you might need to 
-do these steps in Administrator mode.  It is no longer necessary 
-to install a separate Python distribution.
-*   Start Statistics.  You might need to run it as Administrator 
-depending on your security settings.
-*   Open a syntax window and run the following commands
-*   Run this code
-begin program python3.
-nltk.download()
-end program.
+    print("""The nltk module is required in order to use this module.
+See the dialog or syntax help for the procedure.""")
+    #ver = int(spss.GetDefaultPlugInVersion()[4:])
+    #if ver < 280:
+        #print("""
+#*** Installation with SPSS Statistics Version 27 ***
+#This procedure requires several additional items. After installing it, do the following. 
+#Depending on your system setup, you might need to do these steps in Administrator mode.
+#*   Make sure that you have a registered Python 3 distribution matching the Statistics 
+#version you are using. For Statistics version 27, that would be Python 3.8. 
+#If you don't have this, go to Python Software Foundation and install from there. 
+#Don't install this over the distribution installed with Statistics. 
+#After installing it, go to Edit > Options > Files in Statistics and set 
+#this location for Python 3.
+#*   Open a command window, cd to the location of the Python installation, 
+#and install nltk and pyspellchecker from the PyPI site:
+#pip install nltk
+#pip install pyspellchecker
+#*   Start Python from that location and run this code.
+#import nltk
+#nltk.download()
+#This will display a table of items you can add to your installation. 
+#Select at least names, stopwords, wordnet, and vader_lexicon.
+#*   Optionally, go to spelling dictionary as mentioned above 
+#https://github.com/dwyl/english-words/blob/master/words.zip
+#and extract the words.txt file from words.zip.  
+#Specify that location when you run the procedure.
+#*   Install the SPSSINC TRANS extension command via the Statistics 
+#Exensions > Extension Hub menu.""")
+    #else:
+        #print("""
+#***Installation with SPSS Statistics Version 28 and Later ***
+#This procedure requires several additional items. After installing it, 
+#do the following. Depending on your system setup, you might need to 
+#do these steps in Administrator mode.  It is no longer necessary 
+#to install a separate Python distribution.
+#*   Start Statistics.  You might need to run it as Administrator 
+#depending on your security settings.
+#*   Open a syntax window and run the following commands
+#*   Run this code
+#begin program python3.
+#import nltk
+#nltk.download()
+#end program.
 
-This will bring up a window listing the packages available for nltk.  
-*   Click on All Packages and choose at least 
-names, stopwords, wordnet, and vader_lexicon.
-*   Optionally, go to spelling dictionary 
-https://github.com/dwyl/english-words/blob/master/words.zip
-and extract the words.txt file 
-from words.zip.  Specify that location when you run the procedure.
-*   Install the SPSSINC TRANS extension command via the Statistics 
-Extensions > Extension Hub menu.
-""")
-    raise
+#This will bring up a window listing the packages available for nltk.  
+#*   Click on All Packages and choose at least 
+#names, stopwords, wordnet, and vader_lexicon.
+#*   Optionally, go to spelling dictionary 
+#https://github.com/dwyl/english-words/blob/master/words.zip
+#and extract the words.txt file 
+#from words.zip.  Specify that location when you run the procedure.
+#*   Install the SPSSINC TRANS extension command via the Statistics 
+#Extensions > Extension Hub menu.
+#""")
+    #raise
+    
 
-from nltk import SnowballStemmer
-import texta
+
+
 
 extraspelldicts = []
 scoresfiles = []
@@ -103,6 +163,16 @@ def dotext(varnames=None, overwrite=False, stopwordslang="english", stemmerlang=
     
     global allnewnames, extraspelldict, laststopwordslang, sstopwords, stopwordslangg, stemmerlangg, stemmergg
     allnewnames = []
+    #from nltk import downloader
+    #dldir = downloader.Downloader().default_download_dir()
+
+    #installData(downloader, dldir)
+    #import nltk
+    from nltk import SnowballStemmer
+    import texta    
+    
+    # make sure required data files are installed
+
     
     if not any([dospelling, dofreq, dosent, dosearch, doesearch, dolexicon, doscores, dostems, doterms]):
         raise ValueError(_("No actions were specified for the command"))
@@ -547,6 +617,23 @@ def report(newnames):
     pt.SimplePivotTable(rowlabels=[str(i) for i in range(1, len(newnames) + 1)], collabels=[_("Variables")], cells=newnames)
     spss.EndProcedure()
     
+#def installData(downloader, dddir):
+    #"""Install required nltk data files if not already present"""
+    
+    ## data files go wherever nltk wants them
+    ####print(dddir)
+    ####dddir = nltk.downloader.Downloader().default_download_dir()
+    #toget = []
+    #for n in ['corpora/names','corpora/stopwords','corpora/wordnet','sentiment/vader_lexicon',
+              #"tokenizers/punkt", "taggers/averaged_perceptron_tagger", "taggers/averaged_perceptron_tagger_ru",
+              #"chunkers/maxent_ne_chunker", "corpora/words", "corpora/omw", "corpora/omw-1.4"]:
+        #if not os.path.exists(dddir + os.sep + n + ".zip"):
+            #dname = os.path.basename(n)
+            #toget.append(dname)
+    #if toget:
+        #print(_(f"""Downloading nltk data files: {toget} to {dddir}"""))
+        ####nltk.download(toget, quiet=True)    
+        #downloader.download(toget, quiet=True)    
     
 def  Run(args):
     """Execute the STATS TEXTANALYSIS command"""
@@ -614,16 +701,6 @@ def  Run(args):
         Template("DOSTEMS", subc="STEMS", ktype="bool", var="dostems"),
         Template("SUFFIX", subc="STEMS", ktype="varname", var="stemssuffix")])
         
-    #debugging
-    try:
-        import wingdbstub
-        if wingdbstub.debugger != None:
-            import time
-            wingdbstub.debugger.StopDebug()
-            time.sleep(2)
-            wingdbstub.debugger.StartDebug()
-    except:
-        pass
 
     #enable localization
     global _
