@@ -39,6 +39,22 @@ Analyze →
 <img width="998" alt="image" src="https://user-images.githubusercontent.com/19230800/194338660-9315e284-8bd1-48a7-af7c-1cc12d82922a.png">
 <img width="998" alt="image" src="https://user-images.githubusercontent.com/19230800/194338685-bff2aa73-ccdc-4db5-9d59-34187adb789d.png">
 
+### Synatax
+
+Example:
+
+STATS TEXTANALYSIS VARIABLES=gender OVERWRITE=NO STOPWORDSLANG=english STEMMERLANG=english
+ /SPELLING DOSPELLING=NO DICTLANGUAGE=ENGLISH
+ /FREQUENCIES DOFREQ=NO 
+ /SENTIMENT DOSENT=NO 
+ /SEARCH DOSEARCH=NO MODE=ANYWORDS 
+ /ENTITYSEARCH DOESEARCH=NO 
+ /LEXICON DOLEXICON = NO 
+ /WORDSCORES DOSCORES=NO 
+ /SPECIALTERMS DOTERMS=YES 
+ /STEMS DOSTEMS=NO.
+
+
 
 License
 ----
