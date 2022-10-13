@@ -1,4 +1,5 @@
 Name: STATS TEXTANALYSIS
+Display-Name: Text Analysis
 Dialog-Specs: TextAnalysis.cfe
 Command-Specs: STATS_TEXTANALYSIS.xml
 Code-Files: texta.py,STATS_TEXTANALYSIS.py
