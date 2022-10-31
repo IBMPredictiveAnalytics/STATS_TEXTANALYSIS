@@ -6,6 +6,7 @@ version = __version__
 # 07-10-2021 add synonym and named entity search
 # 02-24-2022 add SPECIALTERMS subcommand
 # 07-31-2022 automate nltk_data installs
+# 10-28-2022 add dependency check
 
 import spss, spssaux
 from extension import Template, Syntax, processcmd
@@ -129,6 +130,19 @@ See the dialog or syntax help for the procedure.""")
     #raise
     
 
+def checkdep(package):
+    """Check whether package is installed and fail if not
+    
+    package is the extension command name, e.g., STATS_TEXTANALYSIS"""
+    
+    from importlib import util
+    spec = util.find_spec(package)
+    
+    # if there is a directory matching package but no .py file,
+    # spec will not be None, but there will be no loader
+    if spec is None or spec.loader is None:
+        raise ModuleNotFoundError(_(f"""The {package} extension command is required for this command but is not installed.
+Please install it via the Extensions > Extension Hub menu or install a local copy."""))
 
 
 
@@ -169,11 +183,11 @@ def dotext(varnames=None, overwrite=False, stopwordslang="english", stemmerlang=
     #installData(downloader, dldir)
     #import nltk
     from nltk import SnowballStemmer
-    import texta    
+    import texta
     
+    checkdep("SPSSINC_TRANS")
     # make sure required data files are installed
 
-    
     if not any([dospelling, dofreq, dosent, dosearch, doesearch, dolexicon, doscores, dostems, doterms]):
         raise ValueError(_("No actions were specified for the command"))
     
