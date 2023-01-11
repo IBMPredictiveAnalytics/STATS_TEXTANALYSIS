@@ -9,6 +9,8 @@
 # 17-mar-2021 Output improvements
 # 18-apr-2021 Weight support, n-gram improvements, more language support
 # 03-jun-2021 surface exception if vader_lexicon is not installed
+# 09-jan-2023 Allow , decimal in score.  Stipulate utf-8 encoding in sentiment, emphasis, and negation text files
+
 # Citations:
 # nltk
 # Steven Bird, Ewan Klein, and Edward Loper (2009). Natural Language Processing with Python. O'Reilly Media Inc.
@@ -488,18 +490,19 @@ DATASET ACTIVATE {activeds}.""")
 # Note that words are lowercased
 # ********************************************************************
 
-def terms(negationfile, negationdsname, emphasisfile, emphasisdsname):
+def terms(negationfile, negationdsname, emphasisfile, emphasisdsname, suppencoding):
     """Execute doterms actions"""
     
-    addNegationTerms(negationfile)
-    addEmphasisTerms(emphasisfile)
+    addNegationTerms(negationfile, suppencoding)
+    addEmphasisTerms(emphasisfile, suppencoding)
     createSpecialDatasets([negationdsname, emphasisdsname])
     
     
-def addSentimentScores(filespec):
+def addSentimentScores(filespec, suppencoding):
     """ add a file of word, score pairs to the sentiment lexicon
     
     filespec specifies the file containing the pairs.
+    suppencoding specifies the file encoding to use in reading
     SPSS file handles are supported"""
 
     if filespec is None:
@@ -508,11 +511,11 @@ def addSentimentScores(filespec):
     filespec = spssaux.FileHandles().resolve(filespec)
     wordcount = 0
     badcount = 0
-    with open(filespec) as f:
+    with open(filespec, encoding=suppencoding) as f:
         for line in f:
             try:
                 word, score = line.split()
-                score = float(score)
+                score = makeFloat(score)
             except:
                 badcount += 1
                 if badcount <= 10:
@@ -525,32 +528,32 @@ def addSentimentScores(filespec):
     if badcount > 0:
         print(f"*** Badlines: {badcount}")
     
-def addNegationTerms(filespec):
+def addNegationTerms(filespec, suppencoding):
     """Add terms in filespec to negate terms set"""
     
     if filespec is None:
         return
-    
+    filespec = spssaux.FileHandles().resolve(filespec)
     wordcount = 0
-    with open(filespec) as f:
+    with open(filespec, encoding=suppencoding) as f:    #1/8/2023
         for line in f:
             sia.constants.NEGATE.add(line.replace("\n", "").lower())   # stripping \n if present
             wordcount += 1    
     print(f"Negative terms processed: {wordcount}")
     
-def addEmphasisTerms(filespec):
+def addEmphasisTerms(filespec, suppencoding):
     """Add terms with scores to emphasis term dict"""
     
     if filespec is None:
         return
-    
+    filespec = spssaux.FileHandles().resolve(filespec)
     wordcount = 0
     badcount = 0
-    with open(filespec) as f:
+    with open(filespec, encoding=suppencoding) as f:  # 1/8/2023
         for line in f:
             try:
                 word, score = line.split()
-                score = float(score)
+                score = makeFloat(score)
             except:
                 badcount += 1
                 if badcount <= 10:
@@ -562,6 +565,18 @@ def addEmphasisTerms(filespec):
     if badcount > 0:
         print(f"Bad emphasis terms: {badcount}")
     
+def makeFloat(fvalue):
+    """Convert string value to float allowing for dot or comma decimals
+    
+    fvalue is the string to convert with either "." or "," as the decimal
+    """
+    
+    try:
+        fvalue = float(fvalue.replace(",", "."))
+    except:
+        raise ValueError
+    return fvalue
+
 def createSpecialDatasets(names):
     """create negate and emphasis datasets named as per entries in names"""
     

@@ -3,11 +3,11 @@ Dialog-Specs: TextAnalysis.cfe
 Command-Specs: STATS_TEXTANALYSIS.xml
 Code-Files: texta.py,STATS_TEXTANALYSIS.py
 Misc-Files: extsyntax.css,Readme.md,defaultdialogicon.png,Analyzing Su
- rvey Text.pdf,LICENSE,markdown.html
+ rvey Text.pdf,Analyzing Survey Text.docx,LICENSE,markdown.html
 Summary: Various facilities for working with text data
 Description: Tools for working with text variables
 Author: Jon K Peck
-Version: 1.3.4
+Version: 1.4.0
 Product-Version: 24
 Date: 08/02/2022
 Categories: text analysis sentiment spelling
