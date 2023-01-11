@@ -76,6 +76,7 @@ NEGATIONDSNAME = new dataset name<br/>
 EMPHASISDSNAME = new dataset name<br/>
 NEGATIONFILE = file specification<br/>
 EMPHASISFILE = file specification</p>
+SUPPENCODING = LOCALE<sup>&#42;&#42;</sup> or UTF8<br/>
 
 <p>/STEMS
 DOSTEMS = NO<sup>&#42;&#42;</sup> or YES<br/>
@@ -278,20 +279,29 @@ such as very and somewhat that do not appear in the lexicon.</p>
 <p><strong>DOSCORES</STRONG> specifies whether a sentiment scores files should be loaded.</p>
 <p><strong>FILE</strong> specifies the name of the file to be loaded.  If you generate a lexicon file first,
 you can see how the built-in words are scored as a guide to assigning scores to additional words.  You can
-also change the scores for existing words this way.  The file should be encoded as utf-8.</p>
+also change the scores for existing words this way.  The file should be encoded as Unicode utf-8.</p>
+<p class="bullet">• Scores  can be written with either period or comma as
+the decimal symbol.</p>
+<p class="bullet">• Terms must be single words. Multiple word terms are not supported and will be discarded.</p>
+
 
 <h2>SPECIALTERMS</h2>
 <p><strong>DOTERMS</STRONG> specifies whether the following keywords should be executed.</p>
 <p><strong>NEGATIONFILE</strong> specifies a file containing a list of negation terms
 to be added to the built-in terms.</p>
 <p><strong>EMPHASISFILE</strong> specifies a file containing a list of emphasis terms
-and scores to be added to the built-in terms.</p>
+and scores, separated by a blank, to be added to the built-in terms.</p>
 <p><strong>NEGATIONDSNAME</strong> specifies a new dataset to be created listing all the
 negation terms.</p>
 <p><strong>EMPHASISDSNAME</strong> specifies a new dataset to be created listing all the
 emphasis terms and their scores.</p>
 <p class="bullet">• If a file is loaded and the corresponding dataset is created, the
 dataset will include the material from the file.</p>
+<p class="bullet">• The supplementary sentiment, negation, and emphasis files can be encoded as Unicode UTF-8
+with or without a BOM or in the SPSS locale encoding.</p>
+<p class="bullet">• Scores in the supplementary files can be written with either period or comma as
+the decimal symbol.</p>
+<p class="bullet">• Terms must be single words. Multiple word terms are not supported and will be discarded.</p>
 
 <h2>STEMS</h2
 <p><strong>DOSTEM</STRONG> specifies whether to produce variables containing the results of stemming

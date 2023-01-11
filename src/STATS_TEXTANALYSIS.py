@@ -1,5 +1,5 @@
 __author__  =  'Jon K Peck'
-__version__ =  '1.2'
+__version__ =  '1.3'
 version = __version__
 
 # history
@@ -7,10 +7,11 @@ version = __version__
 # 02-24-2022 add SPECIALTERMS subcommand
 # 07-31-2022 automate nltk_data installs
 # 10-28-2022 add dependency check
+# 01-10-2023 support encodings for supp files
 
 import spss, spssaux
 from extension import Template, Syntax, processcmd
-import sys, re, os
+import sys, re, os, locale
 from itertools import product
 
 # debugging
@@ -173,6 +174,7 @@ def dotext(varnames=None, overwrite=False, stopwordslang="english", stemmerlang=
         doesearch=False, etype="alltypes", outsize=100, esuffix="eser",
         dolexicon=False, lexdsname=None,
         doterms=False, negationfile=None, negationdsname=None, emphasisfile=None, emphasisdsname=None,
+        suppencoding="locale", 
         dostems=False, stemssuffix="stem"):
     
     global allnewnames, extraspelldict, laststopwordslang, sstopwords, stopwordslangg, stemmerlangg, stemmergg
@@ -213,6 +215,10 @@ def dotext(varnames=None, overwrite=False, stopwordslang="english", stemmerlang=
         if (any([dospelling, dofreq, dosent, dosearch, dostems, doesearch])):
             raise ValueError(_("""A task requiring a variable list was specified, but no list was given"""))
         
+    if suppencoding == "locale":
+        suppencoding = locale.getpreferredencoding()
+    else:
+        suppencoding = "utf-8-sig"
     stemmergg = SnowballStemmer(stemmerlang).stem
     stemmerlangg = stemmerlang
     ###searchstemg = searchstem
@@ -224,10 +230,10 @@ def dotext(varnames=None, overwrite=False, stopwordslang="english", stemmerlang=
     if doscores:
         if scoresfile is None:
             raise ValueError(_("A scores file load was required, but no file name was specified"))
-        texta.addSentimentScores(scoresfile)
+        texta.addSentimentScores(scoresfile, suppencoding)
         
     if doterms:
-        texta.terms(negationfile, negationdsname, emphasisfile, emphasisdsname)
+        texta.terms(negationfile, negationdsname, emphasisfile, emphasisdsname, suppencoding)
     
     if dofreq:
         texta.freqslist(varnames, stem=stem, stemcode=stemmergg, stemmerlang=stemmerlang, count=freqcount)
@@ -711,6 +717,8 @@ def  Run(args):
         Template("NEGATIONDSNAME", subc="SPECIALTERMS", ktype="varname", var="negationdsname"),
         Template("EMPHASISFILE", subc="SPECIALTERMS", ktype="literal", var="emphasisfile"),
         Template("EMPHASISDSNAME", subc="SPECIALTERMS", ktype="varname", var="emphasisdsname"),
+        Template("SUPPENCODING", subc="SPECIALTERMS", ktype="str", var="suppencoding", islist=False,
+                 vallist=["utf8", "locale"]), 
     
         Template("DOSTEMS", subc="STEMS", ktype="bool", var="dostems"),
         Template("SUFFIX", subc="STEMS", ktype="varname", var="stemssuffix")])
