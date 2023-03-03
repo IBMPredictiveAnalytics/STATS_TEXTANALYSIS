@@ -10,6 +10,7 @@
 # 18-apr-2021 Weight support, n-gram improvements, more language support
 # 03-jun-2021 surface exception if vader_lexicon is not installed
 # 09-jan-2023 Allow , decimal in score.  Stipulate utf-8 encoding in sentiment, emphasis, and negation text files
+# 26-feb-2023 Add support for German sentiment
 
 # Citations:
 # nltk
@@ -190,9 +191,14 @@ def freqs(varname, label="", weightvar=None, stem=False, stemcode=None, stemmerl
 try:
     from nltk.sentiment import SentimentIntensityAnalyzer
     sia = SentimentIntensityAnalyzer()
+    # German
+    if sys.modules['STATS_TEXTANALYSIS'].sentlanguage == "german":
+        from vaderSentimentGER import SentimentIntensityAnalyzer
+        sia = SentimentIntensityAnalyzer()
 except:
     # Can't raise exception here as exception details will be suppressed higher up
-    print("*** The vader_lexicon file was not found.  Please use nltk.download() to install it")
+    print("*** The English or German vader_lexicon file was not found.  For English, use nltk.download() to install it.")
+    raise 
 
 
 #*****************************************************************
