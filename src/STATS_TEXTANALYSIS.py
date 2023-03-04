@@ -16,13 +16,13 @@ from itertools import product
 
 # debugging
         # makes debug apply only to the current thread
-#try:
-    #import wingdbstub
-    #import threading
-    #wingdbstub.Ensure()
-    #wingdbstub.debugger.SetDebugThreads({threading.get_ident(): 1})
-#except:
-    #pass
+try:
+    import wingdbstub
+    import threading
+    wingdbstub.Ensure()
+    wingdbstub.debugger.SetDebugThreads({threading.get_ident(): 1})
+except:
+    pass
 
 def fixMacCert():
     """Set ssl certificate path on Mac"""
@@ -160,7 +160,7 @@ haswordslistparams = {}
 spellcorrectionparams = {}
 sentimentparams = {}
 hasentitylistparams = {}
-
+sentlanguage = "english"
 langabbrev = {'english':"en", "spanish":"es", "german":"de", "french":"fr", "portuguese": "pt"}
 
 # main routine
@@ -168,7 +168,7 @@ def dotext(varnames=None, overwrite=False, stopwordslang="english", stemmerlang=
         dospelling=False, ignorenames=True, extradict=None, spsuffix="cor", language="english",
         dofreq=False, stem=False, freqcount=10, 
         doscores=False, scoresfile=None,
-        dosent=False, stypes=None, ssuffixes=None,
+        dosent=False, stypes=None, ssuffixes=None, sentlang="english", 
         dosearch=False, searchwords=None, smode="anywords", swsuffix="ser", searchstem=False, 
             posp=None, displaysyn=False, searchlang="eng",
         doesearch=False, etype="alltypes", outsize=100, esuffix="eser",
@@ -177,7 +177,8 @@ def dotext(varnames=None, overwrite=False, stopwordslang="english", stemmerlang=
         suppencoding="locale", 
         dostems=False, stemssuffix="stem"):
     
-    global allnewnames, extraspelldict, laststopwordslang, sstopwords, stopwordslangg, stemmerlangg, stemmergg
+    global allnewnames, extraspelldict, laststopwordslang, sstopwords, stopwordslangg, stemmerlangg, stemmergg, sentlanguage
+    sentlanguage= sentlang
     allnewnames = []
     #from nltk import downloader
     #dldir = downloader.Downloader().default_download_dir()
@@ -239,7 +240,7 @@ def dotext(varnames=None, overwrite=False, stopwordslang="english", stemmerlang=
         texta.freqslist(varnames, stem=stem, stemcode=stemmergg, stemmerlang=stemmerlang, count=freqcount)
         
     if dosent:
-        sentiment(stypes, ssuffixes, nameset, varnames, overwrite)
+        sentiment(stypes, ssuffixes, nameset, varnames, overwrite, sentlanguage)
     
     if dosearch:
         searching(searchwords, smode, nameset, swsuffix, varnames, overwrite, searchstem, posp, displaysyn, searchlang)
@@ -261,7 +262,7 @@ def dotext(varnames=None, overwrite=False, stopwordslang="english", stemmerlang=
     # report variable creation or modification
     report(allnewnames)
 
-def sentiment(stypes, ssuffixes, nameset, varnames, overwrite):
+def sentiment(stypes, ssuffixes, nameset, varnames, overwrite, german):
     
     global sentimentparams
     
@@ -690,6 +691,8 @@ def  Run(args):
             vallist=['neg', 'neu', 'pos', 'comp']),
         Template("SUFFIXES", subc="SENTIMENT", ktype="varname", var="ssuffixes",
             islist=True),
+        Template("LANGUAGE", subc="SENTIMENT", ktype= "str", var="sentlang",
+                 vallist=["english", "german"]),
         
         Template("DOSCORES", subc="WORDSCORES", ktype="bool", var="doscores"),
         Template("FILE", subc="WORDSCORES", ktype="literal", var="scoresfile"),        
