@@ -15,4 +15,3 @@ Plugins: Python
 Python-Version: 3
 Python-Modules: pyspellchecker,nltk,certifi
 Extension-Bundles: SPSSINC TRANS
-Translation-Catalogues: 
