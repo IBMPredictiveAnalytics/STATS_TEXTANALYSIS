@@ -2,12 +2,12 @@ Name: STATS TEXTANALYSIS
 Dialog-Specs: TextAnalysis.cfe
 Command-Specs: STATS_TEXTANALYSIS.xml
 Code-Files: texta.py,vaderSentimentGER.py,STATS_TEXTANALYSIS.py
-Misc-Files: extsyntax.css,MITlicense,Readme.md,defaultdialogicon.png,A
- nalyzing Survey Text.pdf,lex.ZIP,LICENSE,markdown.html
+Misc-Files: extsyntax.css,MITlicense,Readme.md,Analyzing Survey Text.p
+ df,defaultdialogicon.png,lex.ZIP,LICENSE,markdown.html
 Summary: Various facilities for working with text data
 Description: Tools for working with text variables
 Author: Jon K Peck
-Version: 1.5.0
+Version: 1.5.1
 Product-Version: 24
 Date: 08/02/2022
 Categories: text analysis sentiment spelling
@@ -15,3 +15,4 @@ Plugins: Python
 Python-Version: 3
 Python-Modules: pyspellchecker,nltk,certifi
 Extension-Bundles: SPSSINC TRANS
+Translation-Catalogues: 

@@ -1,5 +1,5 @@
 __author__  =  'Jon K Peck'
-__version__ =  '1.3'
+__version__ =  '1.3.1'
 version = __version__
 
 # history
@@ -8,6 +8,7 @@ version = __version__
 # 07-31-2022 automate nltk_data installs
 # 10-28-2022 add dependency check
 # 01-10-2023 support encodings for supp files
+# 08-21-2024 add punkt_tab to the required packages list
 
 import spss, spssaux
 from extension import Template, Syntax, processcmd
@@ -65,7 +66,14 @@ def installData(downloader, dddir):
         # not via the Run function
         print(f"""Downloading nltk data files: {toget} to {dddir}""")
         ###nltk.download(toget, quiet=True)    
-        downloader.download(toget, quiet=True)    
+        downloader.download(toget, quiet=True)
+        # nltk 3.8.2 requires the module below as punkt has been deprecated
+        # due to a pickle security problem.  However, earlier nltk modules may not
+        # be able to handle it, so putting that fetch in a try block
+        try:
+            downloader.download("tokenizers/punkt_tab")
+        except:
+            pass
 
 try:
     from nltk import downloader
