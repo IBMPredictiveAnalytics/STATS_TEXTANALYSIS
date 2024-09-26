@@ -1,5 +1,5 @@
 __author__  =  'Jon K Peck'
-__version__ =  '1.3.1'
+__version__ =  '1.3.2'
 version = __version__
 
 # history
@@ -9,6 +9,7 @@ version = __version__
 # 10-28-2022 add dependency check
 # 01-10-2023 support encodings for supp files
 # 08-21-2024 add punkt_tab to the required packages list
+# 09-24-2024 move punkt_tab to data module list so existing installations will pick it up
 
 import spss, spssaux
 from extension import Template, Syntax, processcmd
@@ -17,13 +18,13 @@ from itertools import product
 
 # debugging
         # makes debug apply only to the current thread
-try:
-    import wingdbstub
-    import threading
-    wingdbstub.Ensure()
-    wingdbstub.debugger.SetDebugThreads({threading.get_ident(): 1})
-except:
-    pass
+#try:
+    #import wingdbstub
+    #import threading
+    #wingdbstub.Ensure()
+    #wingdbstub.debugger.SetDebugThreads({threading.get_ident(): 1})
+#except:
+    #pass
 
 def fixMacCert():
     """Set ssl certificate path on Mac"""
@@ -57,7 +58,7 @@ def installData(downloader, dddir):
     toget = []
     for n in ['corpora/names','corpora/stopwords','corpora/wordnet','sentiment/vader_lexicon',
               "tokenizers/punkt", "taggers/averaged_perceptron_tagger", "taggers/averaged_perceptron_tagger_ru",
-              "chunkers/maxent_ne_chunker", "corpora/words", "corpora/omw", "corpora/omw-1.4"]:
+              "chunkers/maxent_ne_chunker", "corpora/words", "corpora/omw", "corpora/omw-1.4", "tokenizers/punkt_tab"]:
         if not os.path.exists(dddir + os.sep + n + ".zip"):
             dname = os.path.basename(n)
             toget.append(dname)
@@ -67,13 +68,8 @@ def installData(downloader, dddir):
         print(f"""Downloading nltk data files: {toget} to {dddir}""")
         ###nltk.download(toget, quiet=True)    
         downloader.download(toget, quiet=True)
-        # nltk 3.8.2 requires the module below as punkt has been deprecated
-        # due to a pickle security problem.  However, earlier nltk modules may not
-        # be able to handle it, so putting that fetch in a try block
-        try:
-            downloader.download("tokenizers/punkt_tab")
-        except:
-            pass
+        # nltk 3.8.2+ requires the punkt_tab module as punkt has been deprecated
+        # due to a pickle security problem.  
 
 try:
     from nltk import downloader

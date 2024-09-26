@@ -8,7 +8,7 @@ Misc-Files: extsyntax.css,MITlicense,Readme.md,Analyzing Survey Text.p
 Summary: Various facilities for working with text data
 Description: Tools for working with text variables
 Author: Jon K Peck
-Version: 1.5.1
+Version: 1.5.2
 Product-Version: 24
 Date: 08/02/2022
 Categories: text analysis sentiment spelling
